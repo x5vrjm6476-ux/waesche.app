@@ -11,9 +11,21 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Wäsche Counter">
 
-  <!-- App Icon / Fav Icon (RAW GitHub permalink) -->
-  <link rel="icon" href="https://raw.githubusercontent.com/x5vrjm6476-ux/waesche.app/bd3487075d725cc73723d8e129ffed9ad7719775/waeschapp.jpg" type="image/jpeg">
-  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/x5vrjm6476-ux/waesche.app/bd3487075d725cc73723d8e129ffed9ad7719775/waeschapp.jpg">
+  <!-- Icon URL (RAW GitHub permalink) + cache buster -->
+  <!-- Tipp: erhöhe v=2, v=3... wenn iOS stur cached -->
+  <meta name="apple-mobile-web-app-title" content="Wäsche Counter">
+  <link rel="icon" type="image/jpeg"
+        href="https://raw.githubusercontent.com/x5vrjm6476-ux/waesche.app/bd3487075d725cc73723d8e129ffed9ad7719775/waeschapp.jpg?v=1">
+
+  <!-- iOS Home Screen icons (iOS bevorzugt PNG, JPG geht aber oft) -->
+  <link rel="apple-touch-icon" sizes="180x180"
+        href="https://raw.githubusercontent.com/x5vrjm6476-ux/waesche.app/bd3487075d725cc73723d8e129ffed9ad7719775/waeschapp.jpg?v=1">
+  <link rel="apple-touch-icon" sizes="167x167"
+        href="https://raw.githubusercontent.com/x5vrjm6476-ux/waesche.app/bd3487075d725cc73723d8e129ffed9ad7719775/waeschapp.jpg?v=1">
+  <link rel="apple-touch-icon" sizes="152x152"
+        href="https://raw.githubusercontent.com/x5vrjm6476-ux/waesche.app/bd3487075d725cc73723d8e129ffed9ad7719775/waeschapp.jpg?v=1">
+  <link rel="apple-touch-icon" sizes="120x120"
+        href="https://raw.githubusercontent.com/x5vrjm6476-ux/waesche.app/bd3487075d725cc73723d8e129ffed9ad7719775/waeschapp.jpg?v=1">
 
   <style>
     :root{
@@ -39,7 +51,6 @@
       color: var(--text);
     }
 
-    /* Full background on BODY so top+bottom match, including safe-areas */
     body{
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
       background:
@@ -47,22 +58,26 @@
         radial-gradient(900px 600px at 80% 20%, rgba(255,255,255,.04), transparent 55%),
         radial-gradient(800px 600px at 50% 110%, rgba(255,255,255,.05), transparent 60%),
         var(--bg);
-      min-height: 100svh;
-      display:flex;
-      justify-content:center;
 
+      min-height: 100svh;
+
+      /* Safe areas */
       padding:
         env(safe-area-inset-top)
         env(safe-area-inset-right)
         env(safe-area-inset-bottom)
         env(safe-area-inset-left);
+
+      /* Center app vertically + horizontally */
+      display: grid;
+      place-items: center;
     }
 
     .app{
-      width:100%;
-      max-width: 680px;
+      width: min(680px, 100%);
       padding: 24px;
-      /* space for fixed bottom reset */
+
+      /* Leave space for bottom reset bar so content can still center nicely */
       padding-bottom: calc(24px + 56px + env(safe-area-inset-bottom));
     }
 
@@ -268,7 +283,6 @@
       }
     }
 
-    // Click + touch fallback (iOS/WebViews)
     btnHot.addEventListener("click", addHot);
     btnNormal.addEventListener("click", addNormal);
 
