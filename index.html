@@ -11,10 +11,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Wäsche Counter">
 
-  <!-- App Icon / Fav Icon -->
-  <!-- Using: username x5vrjm6476-ux, project waesche.app, file waeschapp.jpg -->
-  <link rel="icon" href="https://x5vrjm6476-ux.waesche.app/waeschapp.jpg" type="image/jpeg">
-  <link rel="apple-touch-icon" href="https://x5vrjm6476-ux.waesche.app/waeschapp.jpg">
+  <!-- App Icon / Fav Icon (RAW GitHub permalink) -->
+  <link rel="icon" href="https://raw.githubusercontent.com/x5vrjm6476-ux/waesche.app/bd3487075d725cc73723d8e129ffed9ad7719775/waeschapp.jpg" type="image/jpeg">
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/x5vrjm6476-ux/waesche.app/bd3487075d725cc73723d8e129ffed9ad7719775/waeschapp.jpg">
 
   <style>
     :root{
@@ -40,7 +39,7 @@
       color: var(--text);
     }
 
-    /* Put the full background on BODY so top+bottom match perfectly */
+    /* Full background on BODY so top+bottom match, including safe-areas */
     body{
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
       background:
@@ -52,7 +51,6 @@
       display:flex;
       justify-content:center;
 
-      /* Extend background into iOS safe areas */
       padding:
         env(safe-area-inset-top)
         env(safe-area-inset-right)
@@ -64,7 +62,7 @@
       width:100%;
       max-width: 680px;
       padding: 24px;
-      /* Leave space for bottom reset link */
+      /* space for fixed bottom reset */
       padding-bottom: calc(24px + 56px + env(safe-area-inset-bottom));
     }
 
@@ -85,7 +83,6 @@
     }
 
     .card{
-      position:relative;
       background: linear-gradient(180deg, var(--card1), var(--card2));
       border: 1px solid var(--stroke);
       border-radius: var(--r);
@@ -140,7 +137,7 @@
       white-space: nowrap;
     }
 
-    /* Reset link fixed at bottom of the screen */
+    /* Reset link fixed at bottom */
     .resetBar{
       position: fixed;
       left: 0;
@@ -148,11 +145,9 @@
       bottom: 0;
       display:flex;
       justify-content:center;
-      pointer-events:none; /* only the button is clickable */
-      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      pointer-events:none;
       padding-top: 10px;
-
-      /* Ensure bottom area matches background (no grey band) */
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
       background: linear-gradient(to top, rgba(11,11,15,.85), rgba(11,11,15,0));
       backdrop-filter: blur(8px);
     }
@@ -273,9 +268,10 @@
       }
     }
 
-    // Click + touch fallback (iOS / WebViews)
+    // Click + touch fallback (iOS/WebViews)
     btnHot.addEventListener("click", addHot);
     btnNormal.addEventListener("click", addNormal);
+
     btnHot.addEventListener("touchend", (e) => { e.preventDefault(); addHot(); }, { passive:false });
     btnNormal.addEventListener("touchend", (e) => { e.preventDefault(); addNormal(); }, { passive:false });
 
