@@ -2,8 +2,27 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Wäsche Counter</title>
+
+  <!-- PWA / iOS Standalone -->
+  <meta name="theme-color" content="#0b0b0f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Wäsche Counter" />
+
+  <!-- Icons (single-file placeholders via Data URI SVG) -->
+  <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect x='6' y='6' width='52' height='52' rx='14' fill='%23111418'/%3E%3Ccircle cx='32' cy='32' r='16' fill='none' stroke='%23ffffff' stroke-opacity='.85' stroke-width='3'/%3E%3Cpath d='M32 24v16M24 32h16' stroke='%23ffffff' stroke-opacity='.85' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <!-- iOS Home Screen icon -->
+  <link rel="apple-touch-icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Crect x='14' y='14' width='152' height='152' rx='44' fill='%23111418'/%3E%3Ccircle cx='90' cy='92' r='44' fill='none' stroke='%23ffffff' stroke-opacity='.9' stroke-width='8'/%3E%3Cpath d='M90 70v44M68 92h44' stroke='%23ffffff' stroke-opacity='.9' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <!-- Web App Manifest (helps Android/desktop; iOS mostly ignores but harmless) -->
+  <link rel="manifest"
+        href="data:application/manifest+json,%7B%22name%22%3A%22W%C3%A4sche%20Counter%22%2C%22short_name%22%3A%22W%C3%A4sche%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230b0b0f%22%2C%22theme_color%22%3A%22%230b0b0f%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D'http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg'%2520width%253D'192'%2520height%253D'192'%2520viewBox%253D'0%25200%2520192%2520192'%253E%253Crect%2520x%253D'14'%2520y%253D'14'%2520width%253D'164'%2520height%253D'164'%2520rx%253D'48'%2520fill%253D'%2523111418'%252F%253E%253Ccircle%2520cx%253D'96'%2520cy%253D'98'%2520r%253D'46'%2520fill%253D'none'%2520stroke%253D'%2523ffffff'%2520stroke-opacity%253D'.9'%2520stroke-width%253D'9'%252F%253E%253Cpath%2520d%253D'M96%252075v46M73%252098h46'%2520stroke%253D'%2523ffffff'%2520stroke-opacity%253D'.9'%2520stroke-width%253D'9'%2520stroke-linecap%253D'round'%252F%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D'http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg'%2520width%253D'512'%2520height%253D'512'%2520viewBox%253D'0%25200%2520512%2520512'%253E%253Crect%2520x%253D'36'%2520y%253D'36'%2520width%253D'440'%2520height%253D'440'%2520rx%253D'128'%2520fill%253D'%2523111418'%252F%253E%253Ccircle%2520cx%253D'256'%2520cy%253D'270'%2520r%253D'124'%2520fill%253D'none'%2520stroke%253D'%2523ffffff'%2520stroke-opacity%253D'.9'%2520stroke-width%253D'22'%252F%253E%253Cpath%2520d%253D'M256%2520208v124M194%2520270h124'%2520stroke%253D'%2523ffffff'%2520stroke-opacity%253D'.9'%2520stroke-width%253D'22'%2520stroke-linecap%253D'round'%252F%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
+
   <style>
     :root{
       color-scheme: dark;
@@ -18,7 +37,6 @@
       --r: 18px;
       --r2: 14px;
     }
-
     *{ box-sizing:border-box; }
     body{
       margin:0;
@@ -35,9 +53,7 @@
         var(--bg);
       color:var(--text);
     }
-
     .wrap{ width:min(680px, 100%); }
-
     .header{
       display:flex;
       justify-content:space-between;
@@ -50,11 +66,6 @@
       font-size:20px;
       font-weight:700;
       letter-spacing:.2px;
-    }
-    .sub{
-      margin:0;
-      font-size:13px;
-      color:var(--muted);
     }
 
     .grid{
@@ -75,17 +86,14 @@
       padding:16px;
       overflow:hidden;
     }
-
-    /* purely visual highlight, cannot block taps */
     .card::before{
       content:"";
       position:absolute;
       inset:-2px;
       background: radial-gradient(320px 180px at 25% 0%, rgba(255,255,255,.08), transparent 60%);
-      pointer-events:none; /* critical */
+      pointer-events:none;
       z-index:0;
     }
-
     .cardTop{
       position:relative;
       z-index:2;
@@ -94,7 +102,6 @@
       align-items:flex-start;
       gap:12px;
     }
-
     .label{
       margin:0 0 6px 0;
       font-size:13px;
@@ -129,7 +136,7 @@
       place-items:center;
       cursor:pointer;
       user-select:none;
-      touch-action: manipulation; /* better iOS tap behavior */
+      touch-action: manipulation;
       transition: transform .08s ease, background .2s ease, border-color .2s ease;
     }
     .plusBtn:active{
@@ -244,7 +251,6 @@
   <main class="wrap">
     <div class="header">
       <h1>Wäsche Counter</h1>
-      <p class="sub">Speichert lokal im Browser</p>
     </div>
 
     <section class="grid" aria-label="Counter">
@@ -296,14 +302,10 @@
   </main>
 
   <script>
-    // Prices
     const PRICE_HOT = 1.50;
     const PRICE_NORMAL = 1.00;
-
-    // Storage key
     const KEY = "laundry_counter_v1";
 
-    // Elements
     const elHot = document.getElementById("countHot");
     const elNormal = document.getElementById("countNormal");
     const elSum = document.getElementById("sumText");
@@ -317,7 +319,6 @@
     const cancelReset = document.getElementById("cancelReset");
     const confirmReset = document.getElementById("confirmReset");
 
-    // State
     let state = loadState();
 
     function clampInt(v){
@@ -369,9 +370,8 @@
     }
 
     function openResetConfirm(){
-      if (dialog && typeof dialog.showModal === "function") {
-        dialog.showModal();
-      } else {
+      if (dialog && typeof dialog.showModal === "function") dialog.showModal();
+      else {
         const ok = confirm("Wirklich zurücksetzen? Alle Zähler werden auf 0 gesetzt.");
         if (ok) doReset();
       }
@@ -387,7 +387,7 @@
       render();
     }
 
-    // Bind events (click + touch fallback for picky WebViews)
+    // events (click + touch fallback)
     btnHot.addEventListener("click", incHot);
     btnNormal.addEventListener("click", incNormal);
 
@@ -400,12 +400,8 @@
     cancelReset.addEventListener("click", closeDialog);
     confirmReset.addEventListener("click", () => { doReset(); closeDialog(); });
 
-    // Dialog cancel (ESC)
     if (dialog){
-      dialog.addEventListener("cancel", (e) => {
-        e.preventDefault();
-        closeDialog();
-      });
+      dialog.addEventListener("cancel", (e) => { e.preventDefault(); closeDialog(); });
     }
 
     render();
