@@ -1,11 +1,288 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="Ebene_1" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22.01 15.04">
-  <defs>
-    <style>
-      .cls-1 {
-        fill: #fff;
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Wäsche Counter</title>
+
+  <!-- iOS / Standalone -->
+  <meta name="theme-color" content="#0b0b0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Wäsche Counter">
+
+  <!-- App Icon / Fav Icon -->
+  <!-- Using: username x5vrjm6476-ux, project waesche.app, file waeschapp.jpg -->
+  <link rel="icon" href="https://x5vrjm6476-ux.waesche.app/waeschapp.jpg" type="image/jpeg">
+  <link rel="apple-touch-icon" href="https://x5vrjm6476-ux.waesche.app/waeschapp.jpg">
+
+  <style>
+    :root{
+      color-scheme: dark;
+      --bg:#0b0b0f;
+      --card1: rgba(255,255,255,.07);
+      --card2: rgba(255,255,255,.05);
+      --stroke: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.55);
+      --muted2: rgba(255,255,255,.35);
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --r: 18px;
+      --r2: 14px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    html, body{
+      height:100%;
+      margin:0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Put the full background on BODY so top+bottom match perfectly */
+    body{
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background:
+        radial-gradient(1100px 700px at 20% 10%, rgba(255,255,255,.06), transparent 60%),
+        radial-gradient(900px 600px at 80% 20%, rgba(255,255,255,.04), transparent 55%),
+        radial-gradient(800px 600px at 50% 110%, rgba(255,255,255,.05), transparent 60%),
+        var(--bg);
+      min-height: 100svh;
+      display:flex;
+      justify-content:center;
+
+      /* Extend background into iOS safe areas */
+      padding:
+        env(safe-area-inset-top)
+        env(safe-area-inset-right)
+        env(safe-area-inset-bottom)
+        env(safe-area-inset-left);
+    }
+
+    .app{
+      width:100%;
+      max-width: 680px;
+      padding: 24px;
+      /* Leave space for bottom reset link */
+      padding-bottom: calc(24px + 56px + env(safe-area-inset-bottom));
+    }
+
+    h1{
+      margin: 0 0 16px 0;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing:.2px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:14px;
+    }
+    @media (max-width: 560px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      position:relative;
+      background: linear-gradient(180deg, var(--card1), var(--card2));
+      border: 1px solid var(--stroke);
+      border-radius: var(--r);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .label{ font-size: 13px; color: var(--muted); }
+    .value{ font-size: 34px; font-weight: 800; letter-spacing:-.6px; line-height:1; margin-top:6px; }
+    .price{ font-size: 12px; color: var(--muted2); margin-top:8px; }
+
+    .plus{
+      -webkit-tap-highlight-color: transparent;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--r2);
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.92);
+      font-size: 22px;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select:none;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+    }
+    .plus:active{
+      transform: scale(.98);
+      background: rgba(255,255,255,.11);
+      border-color: rgba(255,255,255,.22);
+    }
+
+    .sum{
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: var(--r);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      display:flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sumRight{
+      font-size: 12px;
+      color: var(--muted2);
+      white-space: nowrap;
+    }
+
+    /* Reset link fixed at bottom of the screen */
+    .resetBar{
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display:flex;
+      justify-content:center;
+      pointer-events:none; /* only the button is clickable */
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      padding-top: 10px;
+
+      /* Ensure bottom area matches background (no grey band) */
+      background: linear-gradient(to top, rgba(11,11,15,.85), rgba(11,11,15,0));
+      backdrop-filter: blur(8px);
+    }
+
+    .resetBar button{
+      pointer-events:auto;
+      -webkit-tap-highlight-color: transparent;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,.28);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 10px 12px;
+      border-radius: 10px;
+      touch-action: manipulation;
+      transition: color .2s ease, background .2s ease;
+    }
+    .resetBar button:hover{
+      color: rgba(255,255,255,.42);
+      background: rgba(255,255,255,.03);
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <h1>Wäsche Counter</h1>
+
+    <section class="grid" aria-label="Counter">
+      <article class="card">
+        <div>
+          <div class="label">60° Wäsche</div>
+          <div class="value" id="hot">0</div>
+          <div class="price">CHF 1.50 pro Wäsche</div>
+        </div>
+        <button class="plus" id="btnHot" type="button" aria-label="60° Wäsche +1">+</button>
+      </article>
+
+      <article class="card">
+        <div>
+          <div class="label">Normale Wäsche</div>
+          <div class="value" id="normal">0</div>
+          <div class="price">CHF 1.00 pro Wäsche</div>
+        </div>
+        <button class="plus" id="btnNormal" type="button" aria-label="Normale Wäsche +1">+</button>
+      </article>
+    </section>
+
+    <section class="sum" aria-label="Summe">
+      <div>
+        <div class="label">Summe</div>
+        <div class="value" id="sum">CHF 0.00</div>
+      </div>
+      <div class="sumRight"><span id="count">0</span> Wäschen</div>
+    </section>
+  </main>
+
+  <div class="resetBar" aria-label="Zurücksetzen">
+    <button id="resetLink" type="button">zurücksetzen</button>
+  </div>
+
+  <script>
+    const KEY = "laundry_counter_v3";
+    const PRICE_HOT = 1.50;
+    const PRICE_NORMAL = 1.00;
+
+    const elHot = document.getElementById("hot");
+    const elNormal = document.getElementById("normal");
+    const elSum = document.getElementById("sum");
+    const elCount = document.getElementById("count");
+
+    const btnHot = document.getElementById("btnHot");
+    const btnNormal = document.getElementById("btnNormal");
+    const resetLink = document.getElementById("resetLink");
+
+    let state = loadState();
+
+    function clampInt(v){
+      const n = Number(v);
+      if (!Number.isFinite(n)) return 0;
+      return Math.max(0, Math.floor(n));
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        if(!raw) return { hot: 0, normal: 0 };
+        const parsed = JSON.parse(raw);
+        return { hot: clampInt(parsed.hot), normal: clampInt(parsed.normal) };
+      } catch {
+        return { hot: 0, normal: 0 };
       }
-    </style>
-  </defs>
-  <path class="cls-1" d="M21.22.04c-.53-.15-1.08.16-1.23.69,0,.02-.01.04-.02.06l-.53,2.08c-.78-.56-1.71-.85-2.67-.83-1.19-.01-2.33.42-3.22,1.21-1.12,1.07-2.88,1.07-4,0-1.83-1.61-4.58-1.61-6.41,0-.18.14-.34.25-.5.36L1.97.79C1.83.25,1.29-.07.75.07.22.21-.11.75.03,1.29H.03l3.33,13c.12.45.53.76,1,.75h13.28c.47.01.88-.3,1-.75l3.33-13c.15-.53-.16-1.08-.69-1.23-.02,0-.04-.01-.06-.02ZM16.86,13.04H5.08l-1.91-7.44c.43-.21.84-.47,1.21-.77,1.12-1.07,2.88-1.07,4,0,1.84,1.61,4.58,1.61,6.42,0,1.12-1.06,2.88-1.06,4,0l.17.12-2.11,8.09Z"/>
-</svg>
+    }
+
+    function save(){
+      localStorage.setItem(KEY, JSON.stringify(state));
+      render();
+    }
+
+    function render(){
+      elHot.textContent = String(state.hot);
+      elNormal.textContent = String(state.normal);
+
+      const sum = (state.hot * PRICE_HOT) + (state.normal * PRICE_NORMAL);
+      const count = state.hot + state.normal;
+
+      elSum.textContent = "CHF " + sum.toFixed(2);
+      elCount.textContent = String(count);
+    }
+
+    function addHot(){ state.hot++; save(); }
+    function addNormal(){ state.normal++; save(); }
+
+    function resetAll(){
+      if (confirm("Willst du wirklich alles zurücksetzen?")) {
+        state = { hot: 0, normal: 0 };
+        save();
+      }
+    }
+
+    // Click + touch fallback (iOS / WebViews)
+    btnHot.addEventListener("click", addHot);
+    btnNormal.addEventListener("click", addNormal);
+    btnHot.addEventListener("touchend", (e) => { e.preventDefault(); addHot(); }, { passive:false });
+    btnNormal.addEventListener("touchend", (e) => { e.preventDefault(); addNormal(); }, { passive:false });
+
+    resetLink.addEventListener("click", resetAll);
+    resetLink.addEventListener("touchend", (e) => { e.preventDefault(); resetAll(); }, { passive:false });
+
+    render();
+  </script>
+</body>
+</html>
