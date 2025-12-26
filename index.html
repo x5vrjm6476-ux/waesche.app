@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Wäsche</title>
+
+  <!-- iOS / Standalone -->
+  <meta name="theme-color" content="#0b0b0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Wäsche">
+
+  <!-- App Icon -->
+  <link rel="icon" type="image/jpeg"
+        href="https://raw.githubusercontent.com/x5vrjm6476-ux/waesche.app/bd3487075d725cc73723d8e129ffed9ad7719775/waeschapp.jpg?v=10">
+  <link rel="apple-touch-icon" sizes="180x180"
+        href="https://raw.githubusercontent.com/x5vrjm6476-ux/waesche.app/bd3487075d725cc73723d8e129ffed9ad7719775/waeschapp.jpg?v=10">
+
+  <style>
+    :root{
+      color-scheme: dark;
+      --bg:#0b0b0f;
+      --card1: rgba(255,255,255,.07);
+      --card2: rgba(255,255,255,.05);
+      --stroke: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.55);
+      --muted2: rgba(255,255,255,.24);
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --r: 18px;
+      --r2: 14px;
+    }
+    *{ box-sizing:border-box; }
+
+    /* One single background everywhere */
+    html, body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      background: var(--bg);
+      color: var(--text);
+      overscroll-behavior:none;
+    }
+    body{
+      position: fixed;
+      inset: 0;
+      width:100%;
+      height:100%;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
+
+      /* IMPORTANT: no bottom gradient -> prevents the "different bottom color" band */
+      background: var(--bg);
+
+      padding:
+        env(safe-area-inset-top)
+        env(safe-area-inset-right)
+        env(safe-area-inset-bottom)
+        env(safe-area-inset-left);
+
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+    }
+
+    .app{
+      width:min(680px, 100%);
+      padding:24px;
+      margin-top: clamp(18px, 7vh, 70px);
+      padding-bottom: calc(24px + 56px + env(safe-area-inset-bottom));
+    }
+
+    .topbar{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    .roomBtn{
+      border:0;
+      background:transparent;
+      color:var(--text);
+      padding:6px 0;
+      cursor:pointer;
+      text-align:left;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .roomBtn .title{
+      font-size:20px;
+      font-weight:700;
+      letter-spacing:.2px;
+      line-height:1.1;
+    }
+    .roomBtn .sub{
+      margin-top:4px;
+      font-size:12px;
+      color: rgba(255,255,255,.42);
+      letter-spacing:.2px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:14px;
+    }
+    @media (max-width:560px){ .grid{ grid-template-columns:1fr; } }
+
+    .card{
+      background: linear-gradient(180deg, var(--card1), var(--card2));
+      border:1px solid var(--stroke);
+      border-radius: var(--r);
+      padding:16px;
+      box-shadow: var(--shadow);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      overflow:hidden;
+      user-select:none;
+      -webkit-user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: pan-x; /* allow swipe left */
+    }
+
+    .label{ font-size:13px; color:var(--muted); }
+    .value{ font-size:34px; font-weight:800; letter-spacing:-.6px; line-height:1; margin-top:6px; }
+    .price{ font-size:12px; color:var(--muted2); margin-top:8px; }
+
+    .plus{
+      width:48px;
+      height:48px;
+      border-radius: var(--r2);
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.92);
+      font-size:22px;
+      cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+    }
+    .plus:active{
+      transform: scale(.98);
+      background: rgba(255,255,255,.11);
+      border-color: rgba(255,255,255,.22);
+    }
+
+    .sum{
+      margin-top:14px;
+      padding:16px;
+      border-radius: var(--r);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+    .sumRight{
+      font-size:12px;
+      color:var(--muted2);
+      white-space:nowrap;
+    }
+
+    /* Reset: pure text near bottom */
+    .resetTextBar{
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display:flex;
+      justify-content:center;
+      pointer-events:none;
+      padding-bottom: calc(18px + env(safe-area-inset-bottom));
+      background: transparent;
+    }
+    .resetText{
+      pointer-events:auto;
+      font-size:12px;
+      color: rgba(255,255,255,.16);
+      padding: 6px 10px;
+      border-radius:10px;
+      cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      transition: color .2s ease, background .2s ease;
+    }
+    .resetText:hover{
+      color: rgba(255,255,255,.22);
+      background: rgba(255,255,255,.02);
+    }
+
+    dialog{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:0;
+      background: rgba(20,20,24,.92);
+      color: rgba(255,255,255,.92);
+      box-shadow: var(--shadow);
+      width:min(520px, calc(100% - 24px));
+    }
+    dialog::backdrop{
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(8px);
+    }
+    .modal{ padding:16px; }
+    .modal h3{ margin:0 0 6px 0; font-size:16px; font-weight:800; }
+    .modal p{ margin:0 0 14px 0; font-size:13px; color: rgba(255,255,255,.55); line-height:1.35; }
+
+    .tabs{ display:flex; gap:8px; margin-bottom:12px; }
+    .tab{
+      flex:1;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.70);
+      padding:10px 12px;
+      font-size:13px;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab.active{
+      background: rgba(255,255,255,.10);
+      color: rgba(255,255,255,.92);
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .input{
+      width:100%;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      font-size:14px;
+      outline:none;
+    }
+
+    .actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:12px;
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13px;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btnPrimary{
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.10);
+    }
+    .btnDanger{
+      border-color: rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color: rgba(255,255,255,.70);
+    }
+
+    .codeLine{
+      margin-top:10px;
+      font-size:12px;
+      color: rgba(255,255,255,.55);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      color: rgba(255,255,255,.85);
+    }
+    .linkLike{
+      color: rgba(255,255,255,.65);
+      cursor:pointer;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .statusLine{
+      margin-top: 6px;
+      font-size: 12px;
+      color: rgba(255,255,255,.55);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+    .dot{
+      width:8px;height:8px;border-radius:99px;display:inline-block;
+      background: rgba(255,255,255,.25);
+      margin-right:8px;
+    }
+    .dot.ok{ background: rgba(120,255,170,.55); }
+    .dot.bad{ background: rgba(255,180,120,.45); }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <div class="topbar">
+      <button class="roomBtn" id="roomBtn" type="button" aria-label="Menü">
+        <div class="title" id="roomTitle">Wäsche Counter</div>
+        <div class="sub" id="roomSub">Tippen zum Raum erstellen / beitreten</div>
+      </button>
+      <div style="width:1px;"></div>
+    </div>
+
+    <section class="grid">
+      <article class="card" id="cardHot">
+        <div>
+          <div class="label">60° Wäsche</div>
+          <div class="value" id="hot">0</div>
+          <div class="price">CHF 1.50 pro Wäsche</div>
+        </div>
+        <button class="plus" id="btnHot" type="button">+</button>
+      </article>
+
+      <article class="card" id="cardNormal">
+        <div>
+          <div class="label">Normale Wäsche</div>
+          <div class="value" id="normal">0</div>
+          <div class="price">CHF 1.00 pro Wäsche</div>
+        </div>
+        <button class="plus" id="btnNormal" type="button">+</button>
+      </article>
+    </section>
+
+    <section class="sum">
+      <div>
+        <div class="label">Summe</div>
+        <div class="value" id="sum">CHF 0.00</div>
+      </div>
+      <div class="sumRight"><span id="count">0</span> Wäschen</div>
+    </section>
+  </main>
+
+  <div class="resetTextBar">
+    <div class="resetText" id="resetLink" role="button">zurücksetzen</div>
+  </div>
+
+  <!-- DIALOG: when NOT connected -> create/join -->
+  <dialog id="joinDialog">
+    <div class="modal">
+      <h3>Raum</h3>
+      <div class="tabs">
+        <button class="tab active" id="tabCreate" type="button">Erstellen</button>
+        <button class="tab" id="tabJoin" type="button">Beitreten</button>
+      </div>
+
+      <div id="paneCreate">
+        <p>Name (optional)</p>
+        <input class="input" id="roomName" placeholder="z.B. Kim & Noa" maxlength="30">
+        <div class="actions">
+          <button class="btn" id="closeJoin1" type="button">Schliessen</button>
+          <button class="btn btnPrimary" id="createRoomBtn" type="button">Erstellen</button>
+        </div>
+      </div>
+
+      <div id="paneJoin" style="display:none;">
+        <p>Code eingeben</p>
+        <input class="input" id="joinCode" placeholder="z.B. A9F2QZ" autocapitalize="characters" maxlength="12">
+        <div class="actions">
+          <button class="btn" id="closeJoin2" type="button">Schliessen</button>
+          <button class="btn btnPrimary" id="joinRoomBtn" type="button">Beitreten</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- DIALOG: when CONNECTED -> status + code + copy + leave -->
+  <dialog id="statusDialog">
+    <div class="modal">
+      <h3>Raum</h3>
+
+      <div class="statusLine">
+        <div><span class="dot" id="netDot"></span> Status</div>
+        <div id="netText">—</div>
+      </div>
+
+      <div class="codeLine">
+        <div>Code: <span class="mono" id="codeText">—</span></div>
+        <div class="linkLike" id="copyCode">Kopieren</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btnDanger" id="leaveBtn" type="button">Austreten</button>
+        <button class="btn btnPrimary" id="closeStatus" type="button">OK</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- RESET DIALOG -->
+  <dialog id="confirmDialog">
+    <div class="modal">
+      <h3>Wirklich zurücksetzen?</h3>
+      <p>Alle Zähler werden auf 0 gesetzt. Das kann nicht rückgängig gemacht werden.</p>
+      <div class="actions">
+        <button class="btn" id="cancelReset" type="button" autofocus>Nein</button>
+        <button class="btn btnPrimary" id="confirmReset" type="button">Ja, zurücksetzen</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, onValue, get, set, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBJ3jy8zoaFcJNznWOIc2t1fAt5chyIlIg",
+      authDomain: "waesche-c1216.firebaseapp.com",
+      projectId: "waesche-c1216",
+      databaseURL: "https://waesche-c1216-default-rtdb.europe-west1.firebasedatabase.app",
+      storageBucket: "waesche-c1216.firebasestorage.app",
+      messagingSenderId: "46158448054",
+      appId: "1:46158448054:web:0becbeb7c7ed2b39bbad17",
+      measurementId: "G-K4TYN1PFC2"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Cookie + localStorage
+    function setCookie(name, value, days=365){
+      const d = new Date();
+      d.setTime(d.getTime() + days*24*60*60*1000);
+      document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; expires=${d.toUTCString()}; path=/; SameSite=Lax`;
+    }
+    function getCookie(name){
+      const key = encodeURIComponent(name) + "=";
+      const parts = (document.cookie || "").split(";").map(s => s.trim());
+      for (const p of parts) if (p.startsWith(key)) return decodeURIComponent(p.slice(key.length));
+      return "";
+    }
+    function clearCookie(name){
+      document.cookie = `${encodeURIComponent(name)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+    }
+
+    // UI
+    const roomBtn = document.getElementById("roomBtn");
+    const roomTitle = document.getElementById("roomTitle");
+    const roomSub = document.getElementById("roomSub");
+
+    const elHot = document.getElementById("hot");
+    const elNormal = document.getElementById("normal");
+    const elSum = document.getElementById("sum");
+    const elCount = document.getElementById("count");
+
+    const btnHot = document.getElementById("btnHot");
+    const btnNormal = document.getElementById("btnNormal");
+    const cardHot = document.getElementById("cardHot");
+    const cardNormal = document.getElementById("cardNormal");
+
+    const resetLink = document.getElementById("resetLink");
+    const resetDialog = document.getElementById("confirmDialog");
+    const cancelReset = document.getElementById("cancelReset");
+    const confirmReset = document.getElementById("confirmReset");
+
+    // dialogs
+    const joinDialog = document.getElementById("joinDialog");
+    const tabCreate = document.getElementById("tabCreate");
+    const tabJoin = document.getElementById("tabJoin");
+    const paneCreate = document.getElementById("paneCreate");
+    const paneJoin = document.getElementById("paneJoin");
+    const roomNameInput = document.getElementById("roomName");
+    const joinCodeInput = document.getElementById("joinCode");
+    const createRoomBtn = document.getElementById("createRoomBtn");
+    const joinRoomBtn = document.getElementById("joinRoomBtn");
+    const closeJoin1 = document.getElementById("closeJoin1");
+    const closeJoin2 = document.getElementById("closeJoin2");
+
+    const statusDialog = document.getElementById("statusDialog");
+    const netDot = document.getElementById("netDot");
+    const netText = document.getElementById("netText");
+    const codeText = document.getElementById("codeText");
+    const copyCode = document.getElementById("copyCode");
+    const leaveBtn = document.getElementById("leaveBtn");
+    const closeStatus = document.getElementById("closeStatus");
+
+    function formatCHF(n){ return "CHF " + n.toFixed(2); }
+    function renderCounts(hot, normal){
+      hot = Math.max(0, hot|0);
+      normal = Math.max(0, normal|0);
+      elHot.textContent = String(hot);
+      elNormal.textContent = String(normal);
+      elCount.textContent = String(hot + normal);
+      elSum.textContent = formatCHF(hot*1.5 + normal*1.0);
+    }
+
+    // State
+    let currentCode = localStorage.getItem("waesche_room_code") || getCookie("waesche_room_code") || "";
+    let currentName = localStorage.getItem("waesche_room_name") || getCookie("waesche_room_name") || "";
+    let token = 0;
+
+    function isConnected(){ return !!currentCode; }
+
+    function setHeader(){
+      roomTitle.textContent = currentName?.trim() ? currentName.trim() : "Wäsche Counter";
+      roomSub.textContent = isConnected()
+        ? "Tippen für Code / Status"
+        : "Tippen zum Raum erstellen / beitreten";
+    }
+    setHeader();
+    renderCounts(0,0);
+
+    function updateStatusUI(){
+      const online = navigator.onLine;
+      netText.textContent = online ? "online" : "offline";
+      netDot.classList.toggle("ok", online);
+      netDot.classList.toggle("bad", !online);
+      codeText.textContent = currentCode || "—";
+    }
+    window.addEventListener("online", updateStatusUI);
+    window.addEventListener("offline", updateStatusUI);
+
+    function randomCode(len=6){
+      const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+      let out = "";
+      for (let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
+      return out;
+    }
+
+    async function ensureRoomExists(code, name){
+      const r = ref(db, "rooms/" + code);
+      const snap = await get(r);
+      if (!snap.exists()){
+        await set(r, { name: name || "", hot: 0, normal: 0, createdAt: Date.now() });
+      } else if (name && name.trim()){
+        await update(r, { name: name.trim() });
+      }
+    }
+
+    function listenRoom(code){
+      token++;
+      const t = token;
+      onValue(ref(db, "rooms/" + code), (snap) => {
+        if (t !== token) return;
+        const d = snap.val();
+        if (!d) return;
+        const nameFromDb = (d.name || "").trim();
+        if (nameFromDb) {
+          currentName = nameFromDb;
+          localStorage.setItem("waesche_room_name", currentName);
+          setCookie("waesche_room_name", currentName);
+        }
+        setHeader();
+        renderCounts(d.hot || 0, d.normal || 0);
+      });
+    }
+
+    async function connect(code, name){
+      code = (code || "").trim().toUpperCase();
+      if (!code) return;
+
+      await ensureRoomExists(code, name);
+
+      currentCode = code;
+      if (name && name.trim()) currentName = name.trim();
+
+      localStorage.setItem("waesche_room_code", currentCode);
+      localStorage.setItem("waesche_room_name", currentName);
+      setCookie("waesche_room_code", currentCode);
+      setCookie("waesche_room_name", currentName);
+
+      setHeader();
+      listenRoom(currentCode);
+    }
+
+    function leaveRoom(){
+      token++; // invalidate listener
+      currentCode = "";
+      currentName = "";
+      localStorage.removeItem("waesche_room_code");
+      localStorage.removeItem("waesche_room_name");
+      clearCookie("waesche_room_code");
+      clearCookie("waesche_room_name");
+      renderCounts(0,0);
+      setHeader();
+    }
+
+    // auto connect
+    if (currentCode) connect(currentCode, currentName);
+
+    // atomic updates (sync-safe)
+    function inc(field){
+      if (!isConnected()) return;
+      runTransaction(ref(db, "rooms/" + currentCode + "/" + field), (v) => (v || 0) + 1);
+    }
+    function dec(field){
+      if (!isConnected()) return;
+      runTransaction(ref(db, "rooms/" + currentCode + "/" + field), (v) => Math.max(0, (v || 0) - 1));
+    }
+
+    btnHot.addEventListener("click", () => inc("hot"));
+    btnNormal.addEventListener("click", () => inc("normal"));
+
+    // swipe left to decrement
+    function enableSwipeLeft(cardEl, onLeftSwipe){
+      let startX=0, startY=0, dx=0, dy=0, tracking=false, decided=false, horizontal=false;
+      const SWIPE_MIN = 55;
+      const BIAS = 1.15;
+
+      cardEl.addEventListener("touchstart", (e) => {
+        if (e.target.closest("button")) { tracking=false; return; }
+        const t = e.touches[0];
+        startX = t.clientX;
+        startY = t.clientY;
+        dx=dy=0;
+        tracking=true;
+        decided=false;
+        horizontal=false;
+      }, { passive:true });
+
+      cardEl.addEventListener("touchmove", (e) => {
+        if (!tracking) return;
+        const t = e.touches[0];
+        dx = t.clientX - startX;
+        dy = t.clientY - startY;
+
+        const adx = Math.abs(dx), ady = Math.abs(dy);
+        if (!decided && (adx > 6 || ady > 6)){
+          decided = true;
+          horizontal = adx > ady * BIAS;
+        }
+        if (horizontal) e.preventDefault();
+        else if (decided) tracking = false;
+      }, { passive:false });
+
+      cardEl.addEventListener("touchend", () => {
+        if (!tracking) return;
+        tracking=false;
+        if (dx < -SWIPE_MIN && Math.abs(dx) > Math.abs(dy) * BIAS) onLeftSwipe();
+      }, { passive:true });
+
+      cardEl.addEventListener("touchcancel", () => { tracking=false; }, { passive:true });
+    }
+    enableSwipeLeft(cardHot, () => dec("hot"));
+    enableSwipeLeft(cardNormal, () => dec("normal"));
+
+    // dialogs
+    function setTab(which){
+      const create = which === "create";
+      tabCreate.classList.toggle("active", create);
+      tabJoin.classList.toggle("active", !create);
+      paneCreate.style.display = create ? "block" : "none";
+      paneJoin.style.display = create ? "none" : "block";
+    }
+    tabCreate.addEventListener("click", () => setTab("create"));
+    tabJoin.addEventListener("click", () => setTab("join"));
+
+    function openJoinDialog(){ joinDialog.showModal?.(); }
+    function closeJoinDialog(){ if (joinDialog.open) joinDialog.close(); }
+
+    closeJoin1.addEventListener("click", closeJoinDialog);
+    closeJoin2.addEventListener("click", closeJoinDialog);
+    joinDialog.addEventListener("cancel", (e) => { e.preventDefault(); closeJoinDialog(); });
+
+    createRoomBtn.addEventListener("click", async () => {
+      const name = (roomNameInput.value || "").trim();
+      const code = randomCode(6);
+      await connect(code, name);
+      closeJoinDialog();
+      // after creating, show status dialog so user can copy code immediately
+      updateStatusUI();
+      statusDialog.showModal?.();
+    });
+
+    joinRoomBtn.addEventListener("click", async () => {
+      const code = (joinCodeInput.value || "").trim().toUpperCase();
+      if (!code) return;
+      await connect(code, "");
+      closeJoinDialog();
+      updateStatusUI();
+      statusDialog.showModal?.();
+    });
+
+    function openStatusDialog(){
+      updateStatusUI();
+      statusDialog.showModal?.();
+    }
+    function closeStatusDialog(){
+      if (statusDialog.open) statusDialog.close();
+    }
+    closeStatus.addEventListener("click", closeStatusDialog);
+    statusDialog.addEventListener("cancel", (e) => { e.preventDefault(); closeStatusDialog(); });
+
+    copyCode.addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(currentCode);
+        copyCode.textContent = "Kopiert";
+        setTimeout(()=> copyCode.textContent="Kopieren", 900);
+      } catch {
+        copyCode.textContent = "Nicht möglich";
+        setTimeout(()=> copyCode.textContent="Kopieren", 900);
+      }
+    });
+
+    leaveBtn.addEventListener("click", () => {
+      leaveRoom();
+      closeStatusDialog();
+    });
+
+    // Clicking title:
+    // - if not connected -> create/join
+    // - if connected -> status + code + copy + leave
+    roomBtn.addEventListener("click", () => {
+      if (!isConnected()) openJoinDialog();
+      else openStatusDialog();
+    });
+
+    // reset
+    function openReset(){
+      if (!isConnected()) return;
+      resetDialog.showModal?.();
+      cancelReset.focus();
+    }
+    function closeReset(){ if (resetDialog.open) resetDialog.close(); }
+    async function doReset(){
+      await update(ref(db, "rooms/" + currentCode), { hot: 0, normal: 0 });
+    }
+
+    resetLink.addEventListener("click", openReset);
+    cancelReset.addEventListener("click", closeReset);
+    confirmReset.addEventListener("click", async () => { await doReset(); closeReset(); });
+    resetDialog.addEventListener("cancel", (e) => { e.preventDefault(); closeReset(); });
+  </script>
+</body>
+</html>
