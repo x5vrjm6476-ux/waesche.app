@@ -326,7 +326,7 @@
         <div>
           <div class="label">60° Wäsche</div>
           <div class="value" id="hot">0</div>
-          <div class="price">CHF 1.50 pro Wäsche</div>
+          <div class="price">CHF 1.20 pro Wäsche</div>
         </div>
         <button class="plus" id="btnHot" type="button">+</button>
       </article>
@@ -498,7 +498,7 @@
       elHot.textContent = String(hot);
       elNormal.textContent = String(normal);
       elCount.textContent = String(hot + normal);
-      elSum.textContent = formatCHF(hot*1.5 + normal*1.0);
+      elSum.textContent = formatCHF(hot*1.2 + normal*1.0);
     }
 
     // State
